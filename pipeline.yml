@@ -1,0 +1,26 @@
+name: API TEST
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: action/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+
+      - name: Install Newman
+        run: npm install -g newman
+
+      - name: Run Postman API tests
+        run: newman run /INMUSIC_API_TESTS.postman_collection.json -e /inmusic_env_testing.postman_environment.json     
+      
