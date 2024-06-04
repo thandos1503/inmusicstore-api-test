@@ -1,0 +1,435 @@
+{
+	"info": {
+		"_postman_id": "417ce95f-d22e-427e-9e9a-7cf18e4998f8",
+		"name": "INMUSIC_API_TESTS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2849832"
+	},
+	"item": [
+		{
+			"name": "Add To Cart Test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const schema = {\r",
+							"    \"type\": \"object\",\r",
+							"    \"properties\": {\r",
+							"        \"success\": {\"type\": \"boolean\"},\r",
+							"        \"data\": {\"type\": \"integer\"},\r",
+							"        \"cart_id\": {\"type\": \"string\"}\r",
+							"    },\r",
+							"    \"required\": [\"success\", \"data\", \"cart_id\"]\r",
+							"};\r",
+							"\r",
+							"const response = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Validate response schema\", function () {\r",
+							"    pm.expect(response).to.have.jsonSchema(schema);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.environment.set(\"CART_ID\", response.cart_id);\r",
+							"pm.environment.set(\"QUANTITY\", response.data);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "id",
+						"value": "335",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "qty",
+						"value": "2",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\":{{ID}},\n    \"qty\":1,\n    \"session_cart_id\":\"{{SESSION_CART_ID}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{HOST_NAME}}api/us/add_to_cart",
+					"host": [
+						"{{HOST_NAME}}api"
+					],
+					"path": [
+						"us",
+						"add_to_cart"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateCart Test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"const jsonData = pm.response.json();\r",
+							"\r",
+							"const schema = {\r",
+							"    type: \"object\",\r",
+							"    properties: {\r",
+							"        success: { type: \"boolean\" },\r",
+							"        data: {\r",
+							"            type: \"object\",\r",
+							"            properties: {\r",
+							"                items: {\r",
+							"                    type: \"array\",\r",
+							"                    items: {\r",
+							"                        type: \"object\",\r",
+							"                        properties: {\r",
+							"                            product_id: { type: \"integer\" },\r",
+							"                            product_name: { type: \"string\" },\r",
+							"                            total_item_price: { type: \"string\" },\r",
+							"                            item_price: { type: \"string\" },\r",
+							"                            qty: { type: \"integer\" },\r",
+							"                            currency: { type: \"string\" }\r",
+							"                        },\r",
+							"                        required: [\"product_id\", \"product_name\", \"total_item_price\", \"item_price\", \"qty\", \"currency\"]\r",
+							"                    }\r",
+							"                },\r",
+							"                total_count: { type: \"integer\" },\r",
+							"                total_cart_price: { type: \"string\" }\r",
+							"            },\r",
+							"            required: [\"items\", \"total_count\", \"total_cart_price\"]\r",
+							"        },\r",
+							"        cart_id: { type: \"string\" }\r",
+							"    },\r",
+							"    required: [\"success\", \"data\", \"cart_id\"]\r",
+							"};\r",
+							"\r",
+							"\r",
+							"console.log(jsonData.data.items[0].qty)\r",
+							"\r",
+							"\r",
+							"\r",
+							"pm.test(\"Validate response schema\", function () {\r",
+							"    pm.expect(tv4.validate(jsonData, schema)).to.be.true;\r",
+							"    pm.expect(tv4.error).to.be.null;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Check success is true\", function () {\r",
+							"    pm.expect(jsonData.success).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Check cart_id is present\", function () {\r",
+							"    pm.expect(jsonData.cart_id).to.exist;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Check data properties\", function () {\r",
+							"    pm.expect(jsonData.data).to.have.property(\"items\");\r",
+							"    pm.expect(jsonData.data).to.have.property(\"total_count\");\r",
+							"    pm.expect(jsonData.data).to.have.property(\"total_cart_price\");\r",
+							"    pm.expect(jsonData.data.items).to.be.an(\"array\").that.is.not.empty;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Check item properties\", function () {\r",
+							"    const item = jsonData.data.items[0]\r",
+							"    pm.expect(item).to.have.property(\"product_id\");\r",
+							"    pm.expect(item).to.have.property(\"product_name\");\r",
+							"    pm.expect(item).to.have.property(\"total_item_price\");\r",
+							"    pm.expect(item).to.have.property(\"item_price\");\r",
+							"    pm.expect(item).to.have.property(\"qty\");\r",
+							"    pm.expect(item).to.have.property(\"currency\");\r",
+							"\r",
+							"    pm.environment.set(\"QUANTITY\", jsonData.data.items[0].qty);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": [\n        {\n            \"product_id\": {{ID}},\n            \"qty\": 3\n        }\n    ],\n    \"session_cart_id\": \"{{SESSION_CART_ID}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{HOST_NAME}}api/us/update_cart",
+					"host": [
+						"{{HOST_NAME}}api"
+					],
+					"path": [
+						"us",
+						"update_cart"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetCart Test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"const schema = {\r",
+							"    \"type\": \"object\",\r",
+							"    \"properties\": {\r",
+							"        \"cartId\": {\"type\": \"string\"},\r",
+							"        \"cartCurrency\": {\"type\": \"string\"},\r",
+							"        \"lineItems\": {\r",
+							"            \"type\": \"array\",\r",
+							"            \"items\": {\r",
+							"                \"type\": \"object\",\r",
+							"                \"properties\": {\r",
+							"                    \"lineItemId\": {\"type\": \"integer\"},\r",
+							"                    \"quantity\": {\"type\": \"integer\"},\r",
+							"                    \"product\": {\r",
+							"                        \"type\": \"object\",\r",
+							"                        \"properties\": {\r",
+							"                            \"productCode\": {\"type\": \"string\"},\r",
+							"                            \"title\": {\"type\": \"string\"},\r",
+							"                            \"description\": {\"type\": \"string\"},\r",
+							"                            \"imageUrl\": {\"type\": \"string\"},\r",
+							"                            \"isReturnProhibited\": {\"type\": \"boolean\"},\r",
+							"                            \"inStock\": {\"type\": \"boolean\"},\r",
+							"                            \"price\": {\r",
+							"                                \"type\": \"object\",\r",
+							"                                \"properties\": {\r",
+							"                                    \"price\": {\r",
+							"                                        \"type\": \"object\",\r",
+							"                                        \"properties\": {\r",
+							"                                            \"currencyCode\": {\"type\": \"string\"},\r",
+							"                                            \"amount\": {\"type\": \"string\"}\r",
+							"                                        },\r",
+							"                                        \"required\": [\"currencyCode\", \"amount\"]\r",
+							"                                    },\r",
+							"                                    \"discounts\": {\r",
+							"                                        \"type\": \"array\",\r",
+							"                                        \"items\": {\r",
+							"                                            \"type\": \"object\",\r",
+							"                                            \"properties\": {\r",
+							"                                                \"discount\": {\r",
+							"                                                    \"type\": \"object\",\r",
+							"                                                    \"properties\": {\r",
+							"                                                        \"currencyCode\": {\"type\": \"string\"},\r",
+							"                                                        \"amount\": {\"type\": \"string\"}\r",
+							"                                                    },\r",
+							"                                                    \"required\": [\"currencyCode\", \"amount\"]\r",
+							"                                                },\r",
+							"                                                \"beforeDiscount\": {\r",
+							"                                                    \"type\": \"object\",\r",
+							"                                                    \"properties\": {\r",
+							"                                                        \"currencyCode\": {\"type\": \"string\"},\r",
+							"                                                        \"amount\": {\"type\": \"string\"}\r",
+							"                                                    },\r",
+							"                                                    \"required\": [\"currencyCode\", \"amount\"]\r",
+							"                                                }\r",
+							"                                            },\r",
+							"                                            \"required\": [\"discount\", \"beforeDiscount\"]\r",
+							"                                        }\r",
+							"                                    }\r",
+							"                                },\r",
+							"                                \"required\": [\"price\", \"discounts\"]\r",
+							"                            }\r",
+							"                        },\r",
+							"                        \"required\": [\"productCode\", \"title\", \"description\", \"imageUrl\", \"isReturnProhibited\", \"inStock\", \"price\"]\r",
+							"                    }\r",
+							"                },\r",
+							"                \"required\": [\"lineItemId\", \"quantity\", \"product\"]\r",
+							"            }\r",
+							"        },\r",
+							"        \"contactDetails\": {\r",
+							"            \"type\": \"array\"\r",
+							"        },\r",
+							"        \"cartDiscountsInfo\": {\r",
+							"            \"type\": \"object\",\r",
+							"            \"properties\": {\r",
+							"                \"price\": {\r",
+							"                    \"type\": \"object\",\r",
+							"                    \"properties\": {\r",
+							"                        \"currencyCode\": {\"type\": \"string\"},\r",
+							"                        \"amount\": {\"type\": \"string\"}\r",
+							"                    },\r",
+							"                    \"required\": [\"currencyCode\", \"amount\"]\r",
+							"                }\r",
+							"            },\r",
+							"            \"required\": [\"price\"]\r",
+							"        },\r",
+							"        \"shopperCheckoutExperience\": {\r",
+							"            \"type\": \"object\",\r",
+							"            \"properties\": {\r",
+							"                \"useDeliveryContactDetailsForPaymentContactDetails\": {\"type\": \"boolean\"},\r",
+							"                \"emailMarketingOptIn\": {\"type\": \"boolean\"}\r",
+							"            },\r",
+							"            \"required\": [\"useDeliveryContactDetailsForPaymentContactDetails\", \"emailMarketingOptIn\"]\r",
+							"        }\r",
+							"    },\r",
+							"    \"required\": [\"cartId\", \"cartCurrency\", \"lineItems\", \"contactDetails\", \"cartDiscountsInfo\", \"shopperCheckoutExperience\"]\r",
+							"};\r",
+							"\r",
+							"const response = pm.response.json();\r",
+							"const quantity = pm.environment.get(\"QUANTITY\");\r",
+							"const cart_id = pm.environment.get(\"CART_ID\");\r",
+							"const id = parseInt(pm.environment.get(\"ID\"));\r",
+							"\r",
+							"pm.test(\"Validate response schema\", function () {\r",
+							"    pm.expect(response).to.have.jsonSchema(schema);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate response Quantity\", function () {\r",
+							"    pm.expect(response.lineItems[0].quantity).to.equal(quantity);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate response Cart ID\", function () {\r",
+							"    pm.expect(response.cartId).to.equal(cart_id);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate response LineItemID\", function () {\r",
+							"    pm.expect(response.lineItems[0].lineItemId).to.equal(id);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "3puvBAyGdqgRBKePri0YUj1KV",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "yIWUNp4zigFtubM",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{HOST_NAME}}esw/GetCart/{{CART_ID}}",
+					"host": [
+						"{{HOST_NAME}}esw"
+					],
+					"path": [
+						"GetCart",
+						"{{CART_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteCart Test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const schema = {\r",
+							"    \"type\": \"object\",\r",
+							"    \"properties\": {\r",
+							"        \"message\": {\"type\": \"string\"}\r",
+							"    },\r",
+							"    \"required\": [\"message\"]\r",
+							"};\r",
+							"\r",
+							"const response = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Validate response schema\", function () {\r",
+							"    pm.expect(response).to.have.jsonSchema(schema);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							" \r",
+							"pm.test(\"Body matches string\", function () {\r",
+							"    pm.expect(response.message).to.equal(\"Cart deleted successfully\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "3puvBAyGdqgRBKePri0YUj1KV",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "yIWUNp4zigFtubM",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{HOST_NAME}}esw/DeleteCart/{{CART_ID}}",
+					"host": [
+						"{{HOST_NAME}}esw"
+					],
+					"path": [
+						"DeleteCart",
+						"{{CART_ID}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
